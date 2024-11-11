@@ -14,19 +14,44 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
           java-version: '17'
+
       - name: Build with Maven
         run: mvn clean install
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: my-artifact
           path: target/*.jar
+
       - name: Upload test reports
         uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: target/surefire-reports/*.xml
+
+  performance-test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install k6
+        run: |
+          sudo apt update
+          sudo apt install -y k6
+
+      - name: Run k6 Performance Tests
+        run: k6 run --out json=report.json script.js
+
+      - name: Upload k6 test report
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-report
+          path: report.json

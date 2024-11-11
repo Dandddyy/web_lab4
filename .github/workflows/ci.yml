@@ -44,8 +44,7 @@ jobs:
 
       - name: Install k6
         run: |
-          sudo apt update
-          sudo apt install -y k6
+          sudo snap install k6
 
       - name: Run k6 Performance Tests
         run: k6 run --out json=report.json script.js

@@ -12,11 +12,11 @@ export let options = {
         },
         constant_rate: {
             executor: 'constant-arrival-rate',
-            rate: 5,               // 5 запросов в секунду
+            rate: 5,
             timeUnit: '1s',
             duration: '1m',
-            preAllocatedVUs: 10,    // начальное количество VUs
-            maxVUs: 20,             // максимум VUs, если нагрузка возрастет
+            preAllocatedVUs: 10,
+            maxVUs: 20,
             exec: 'constantRate',
             gracefulStop: '30s',
         },
@@ -37,7 +37,7 @@ export let options = {
 export function constantLoad() {
     const res = http.get('http://localhost:7070/products/1');
     check(res, { 'status is 200': (r) => r.status === 200 });
-    sleep(Math.random() * 2 + 1);  // Задержка от 1 до 3 секунд
+    sleep(Math.random() * 2 + 1);
 }
 
 export function constantRate() {

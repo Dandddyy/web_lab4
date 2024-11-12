@@ -23,34 +23,36 @@ jobs:
       - name: Build with Maven
         run: mvn clean install
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: my-artifact
-          path: target/*.jar
+      - name: Start Application
+        run: |
+          java -jar target/my-app.jar &
+          echo $! > app.pid
+        env:
+          SPRING_PROFILES_ACTIVE: ci
 
-      - name: Upload test reports
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: target/surefire-reports/*.xml
-
-  performance-test:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Wait for Application to Start
+        run: |
+          
+          for i in {1..30}; do
+            if nc -z localhost 7070; then
+              echo "Application started"
+              break
+            fi
+            echo "Waiting for application..."
+            sleep 1
+          done
 
       - name: Install k6
-        run: |
-          sudo snap install k6
+        run: sudo snap install k6
 
       - name: Run k6 Performance Tests
-        run: k6 run --out json=report.json script.js
+        run: k6 run --out json=report.json tests/script.js
 
-      - name: Upload k6 test report
+      - name: Upload k6 Test Report
         uses: actions/upload-artifact@v4
         with:
           name: k6-report
           path: report.json
+
+      - name: Stop Application
+        run: kill $(cat app.pid)

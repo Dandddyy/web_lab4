@@ -25,7 +25,7 @@ jobs:
 
       - name: Start Application
         run: |
-          java -jar target/my-app.jar &
+          java -jar target/lab1-0.0.1-SNAPSHOT.jar &
           echo $! > app.pid
         env:
           SPRING_PROFILES_ACTIVE: ci
